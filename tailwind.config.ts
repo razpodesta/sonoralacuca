@@ -1,4 +1,3 @@
-// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -12,10 +11,11 @@ const config: Config = {
       colors: {
         "brand-dark": "#1a1a2e",
         "brand-accent": "#e94560",
+        "brand-primary": "#c59d42", // Color dorado para elementos activos/destacados
       },
       fontFamily: {
-        // Añadimos Playfair Display como 'serif-brand'
         "serif-brand": ["var(--font-playfair-display)", "serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
     },
   },

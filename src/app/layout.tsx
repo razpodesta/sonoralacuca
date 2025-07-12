@@ -1,7 +1,13 @@
-import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
-import "./globals.css";
+"use client";
+
+import WelcomeAudioPlayer from "@/components/audio/WelcomeAudioPlayer";
+import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import Preloader from "@/components/layout/Preloader";
+import { AnimatePresence, motion } from "framer-motion";
+import { Inter, Playfair_Display } from "next/font/google";
+import { usePathname } from "next/navigation";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,29 +18,36 @@ const playfair = Playfair_Display({
   variable: "--font-playfair-display",
 });
 
-// SEO Optimizado: Usamos el objeto metadata para definir una plantilla de título.
-export const metadata: Metadata = {
-  title: {
-    template: "%s | Sonora La Cuca", // Cada página agregará su título aquí
-    default: "Sonora La Cuca - Sitio Web Oficial", // Título para la página de inicio
-  },
-  description:
-    "El sitio oficial de la banda Sonora La Cuca. Descubre nuestra música, próximas fechas, biografía y más.",
-  // Aquí podemos añadir más metadatos para SEO y redes sociales en el futuro
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
   return (
     <html lang="es">
       <body
-        className={`${inter.variable} ${playfair.variable} bg-brand-dark text-white font-sans antialiased`}
+        className={`${inter.variable} ${playfair.variable} bg-brand-dark text-white font-sans antialiased flex flex-col min-h-screen`}
       >
+        <Preloader />
+        {/* Las guirnaldas ahora están comentadas para no sobrecargar el diseño, se pueden reactivar si se desea */}
+        {/* <Guirnaldas /> */}
         <Header />
-        <main>{children}</main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="flex-grow"
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
+        <WelcomeAudioPlayer />
+        <Footer />
       </body>
     </html>
   );
