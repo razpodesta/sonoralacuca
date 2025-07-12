@@ -17,10 +17,6 @@ const playfair = Playfair_Display({
   variable: "--font-playfair-display",
 });
 
-/**
- * Metadatos estáticos para el sitio. Sirve como plantilla y valores por defecto.
- * Las páginas pueden sobreescribir o extender estos metadatos.
- */
 export const metadata: Metadata = {
   title: {
     template: "%s | Sonora La Cuca",
@@ -30,13 +26,6 @@ export const metadata: Metadata = {
     "El sitio oficial de la banda Sonora La Cuca. Descubre nuestra música, próximas fechas, biografía y más.",
 };
 
-/**
- * El layout raíz de la aplicación, como Componente de Servidor puro.
- * Define la estructura HTML principal y envuelve el contenido de la página
- * en el componente de cliente PageTransition para las animaciones.
- * @param children - El contenido de la página actual.
- * @returns La estructura HTML completa del sitio.
- */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,7 +39,6 @@ export default function RootLayout({
         <Preloader />
         <Guirnaldas />
         <Header />
-        {/* Envolvemos el contenido en el componente de cliente para las animaciones */}
         <main className="flex-grow flex">
           <PageTransition>{children}</PageTransition>
         </main>
@@ -60,13 +48,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// ===============================================================================================
-// MEJORAS FUTURAS:
-// - Crear un sitemap dinámico para mejorar el rastreo de los motores de búsqueda.
-// - Implementar un sistema de cookies con un banner de consentimiento para cumplir con GDPR.
-// - Añadir datos estructurados (Schema.org) para optimizar el SEO de conciertos y discografía.
-// ===============================================================================================
-// Si lees este mensaje y tienes implementaciones futuras, en la próxima entrega de código
-// de este aparato las realizaré junto con la tarea que esté en curso.
-// ===============================================================================================

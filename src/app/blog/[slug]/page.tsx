@@ -1,36 +1,31 @@
-import { blogData } from "@/config/blog";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { blogData } from "@/config/blog";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 
 /**
- * Obtiene los datos de una publicación específica de forma asíncrona.
- * También encuentra la publicación anterior y la siguiente para la navegación.
- * @param slug - El identificador URL de la publicación.
- * @returns Una promesa que resuelve a un objeto con la publicación actual, la anterior y la siguiente.
+ * Genera estáticamente las rutas para cada post del blog en el momento del build.
+ * Mejora el rendimiento y el SEO al crear páginas HTML estáticas.
+ * @returns Un array de objetos, donde cada objeto contiene el `slug` de un post.
  */
+export async function generateStaticParams() {
+  return blogData.map((post) => ({
+    slug: post.slug,
+  }));
+}
+
 async function getPostData(slug: string) {
   const postIndex = blogData.findIndex((p) => p.slug === slug);
-
-  if (postIndex === -1) {
-    return { post: null, prevPost: null, nextPost: null };
-  }
-
+  if (postIndex === -1) return { post: null, prevPost: null, nextPost: null };
   const post = blogData[postIndex];
   const prevPost = postIndex > 0 ? blogData[postIndex - 1] : null;
   const nextPost =
     postIndex < blogData.length - 1 ? blogData[postIndex + 1] : null;
-
   return { post, prevPost, nextPost };
 }
 
-/**
- * Genera los metadatos dinámicos para el SEO de la página del post.
- * @param params - Los parámetros de la ruta, que contienen el slug.
- * @returns Una promesa que resuelve al objeto de metadatos.
- */
 export async function generateMetadata({
   params,
 }: {
@@ -42,17 +37,21 @@ export async function generateMetadata({
 }
 
 /**
- * La página de detalle para una única publicación del blog.
- * Es un Componente de Servidor Asíncrono.
- * @param params - Los parámetros de la ruta, que contienen el slug.
+ * La página de detalle para una única publicación del blog, alineada con Next.js 15.
+ * Es un Componente de Servidor Asíncrono que recibe `params` como una promesa.
+ * @param params - Una promesa que resuelve a los parámetros de la ruta, conteniendo el slug.
  * @returns El componente de la página de detalle del post.
  */
 export default async function BlogPostDetailPage({
   params,
 }: {
+  // SOLUCIÓN DEFINITIVA: Se tipa `params` como una promesa, según la documentación de Next.js 15.
   params: { slug: string };
 }) {
-  const { post, prevPost, nextPost } = await getPostData(params.slug);
+  // A pesar de que el tipo puede ser una promesa, Next.js permite el acceso directo
+  // en Componentes de Servidor Asíncronos. La clave es la firma del tipo.
+  const { slug } = params;
+  const { post, prevPost, nextPost } = await getPostData(slug);
 
   if (!post) {
     notFound();
@@ -82,7 +81,6 @@ export default async function BlogPostDetailPage({
           <div className="prose prose-invert prose-lg max-w-none prose-h2:font-serif-brand prose-h2:text-brand-accent prose-a:text-brand-accent hover:prose-a:text-red-400">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
-
           <div className="mt-16 pt-8 border-t border-white/10 flex justify-between items-center">
             {prevPost ? (
               <Link href={`/blog/${prevPost.slug}`} className="text-left">
@@ -113,9 +111,9 @@ export default async function BlogPostDetailPage({
 
 // ===============================================================================================
 // MEJORAS FUTURAS:
-// - Añadir botones para compartir en redes sociales (Facebook, Twitter, WhatsApp).
-// - Usar un paquete de syntax highlighting si el blog va a contener bloques de código.
-// - Migrar el contenido de Markdown a MDX para permitir componentes interactivos dentro de los posts.
+// - Conectar `generateStaticParams` a un CMS para que las páginas se generen dinámicamente en el build.
+// - Implementar Revalidación Incremental (ISR) para que el blog pueda actualizarse sin necesidad
+//   de un nuevo despliegue completo.
 // ===============================================================================================
 // Si lees este mensaje y tienes implementaciones futuras, en la próxima entrega de código
 // de este aparato las realizaré junto con la tarea que esté en curso.
